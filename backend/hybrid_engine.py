@@ -16,12 +16,11 @@ Architecture Philosophy
 Dependencies
 ------------
 - ``risk_engine.py``   – must already be accessible on ``sys.path``.
-- ``diabetes_model.pkl``  – pre-trained scikit-learn classifier.
-- ``diabetes_scaler.pkl`` – fitted StandardScaler for feature normalisation.
+- ``diabetes_model.pkl``  – pre-trained scikit-learn classifier (RandomForest).
 
 Functions
 ---------
-- load_ml_components       : Load model + scaler from disk.
+- load_ml_model            : Load model from disk.
 - predict_ml_probability   : Add ML-derived probability column.
 - final_hybrid_decision    : Row-level hybrid classification logic.
 - apply_hybrid_engine      : DataFrame-level orchestrator.
@@ -32,7 +31,7 @@ from __future__ import annotations
 import os
 import pickle
 from pathlib import Path
-from typing import Any, Tuple
+from typing import Any
 
 import pandas as pd
 
@@ -43,9 +42,11 @@ import pandas as pd
 _MODULE_DIR = Path(os.path.dirname(os.path.abspath(__file__)))
 
 _DEFAULT_MODEL_PATH = _MODULE_DIR / "models" / "diabetes_model.pkl"
-_DEFAULT_SCALER_PATH = _MODULE_DIR / "models" / "diabetes_scaler.pkl"
 
-_ML_FEATURES = ["Glucose", "BMI", "Age", "BloodPressure"]
+_ML_FEATURES = [
+    "Pregnancies", "Glucose", "BloodPressure", "SkinThickness", 
+    "Insulin", "BMI", "DiabetesPedigreeFunction", "Age"
+]
 
 # Mapping from the user's input DataFrame columns → model's expected names.
 # Missing features get a population-median default so the model still works.
@@ -54,8 +55,12 @@ _COLUMN_MAP = {
     "age": "Age",
 }
 _FEATURE_DEFAULTS = {
-    "BMI": 28.0,            # population median fallback
-    "BloodPressure": 72.0,  # population median fallback
+    "Pregnancies": 0.0,
+    "BloodPressure": 72.0,
+    "SkinThickness": 20.0,
+    "Insulin": 79.0,
+    "BMI": 32.0,
+    "DiabetesPedigreeFunction": 0.5,
 }
 
 
@@ -63,50 +68,38 @@ _FEATURE_DEFAULTS = {
 # 1. Load ML Components
 # ---------------------------------------------------------------------------
 
-def load_ml_components(
+def load_ml_model(
     model_path: str | Path | None = None,
-    scaler_path: str | Path | None = None,
-) -> Tuple[Any, Any]:
-    """Load the pre-trained ML model and its associated scaler.
+) -> Any:
+    """Load the pre-trained ML model.
 
     Parameters
     ----------
     model_path : str | Path | None
         Path to ``diabetes_model.pkl``.  Defaults to the project root.
-    scaler_path : str | Path | None
-        Path to ``diabetes_scaler.pkl``.  Defaults to the project root.
 
     Returns
     -------
-    tuple[model, scaler]
-        The deserialised scikit-learn model and ``StandardScaler``.
+    model
+        The deserialised scikit-learn model.
 
     Raises
     ------
     FileNotFoundError
-        If either ``.pkl`` file does not exist at the specified path.
+        If the ``.pkl`` file does not exist at the specified path.
     """
     model_path = Path(model_path) if model_path else _DEFAULT_MODEL_PATH
-    scaler_path = Path(scaler_path) if scaler_path else _DEFAULT_SCALER_PATH
 
     if not model_path.exists():
         raise FileNotFoundError(
             f"ML model not found at: {model_path}. "
-            "Ensure 'diabetes_model.pkl' exists."
-        )
-    if not scaler_path.exists():
-        raise FileNotFoundError(
-            f"Scaler not found at: {scaler_path}. "
-            "Ensure 'diabetes_scaler.pkl' exists."
+            "Ensure 'models/diabetes_model.pkl' exists."
         )
 
     with open(model_path, "rb") as f:
         model = pickle.load(f)
 
-    with open(scaler_path, "rb") as f:
-        scaler = pickle.load(f)
-
-    return model, scaler
+    return model
 
 
 # ---------------------------------------------------------------------------
@@ -116,7 +109,6 @@ def load_ml_components(
 def predict_ml_probability(
     df: pd.DataFrame,
     model: Any | None = None,
-    scaler: Any | None = None,
 ) -> pd.DataFrame:
     """Add an ``ml_probability`` column derived from the ML model.
 
@@ -124,9 +116,9 @@ def predict_ml_probability(
     --------
     1. Map input columns to the model's expected feature names
        (e.g. ``fasting_glucose`` → ``Glucose``, ``age`` → ``Age``).
-    2. Fill missing features (``BMI``, ``BloodPressure``) with
+    2. Fill missing features (``BMI``, ``SkinThickness``, etc.) with
        population-median defaults.
-    3. Scale features and compute class-1 probability.
+    3. Compute class-1 probability using the RandomForest.
 
     Parameters
     ----------
@@ -134,16 +126,14 @@ def predict_ml_probability(
         Must contain at least ``fasting_glucose`` and ``age``.
     model : sklearn estimator, optional
         Pre-trained classifier.  Loaded from disk if not supplied.
-    scaler : sklearn transformer, optional
-        Fitted scaler.  Loaded from disk if not supplied.
 
     Returns
     -------
     pd.DataFrame
         A **copy** of *df* with the ``ml_probability`` column added.
     """
-    if model is None or scaler is None:
-        model, scaler = load_ml_components()
+    if model is None:
+        model = load_ml_model()
 
     result = df.copy()
 
@@ -163,10 +153,9 @@ def predict_ml_probability(
 
     # Ensure column order matches model expectation
     x_raw = feature_df[_ML_FEATURES].values
-    x_scaled = scaler.transform(x_raw)
 
     # Probability of the positive (high-risk) class
-    result["ml_probability"] = model.predict_proba(x_scaled)[:, 1]
+    result["ml_probability"] = model.predict_proba(x_raw)[:, 1]
 
     return result
 
@@ -220,7 +209,6 @@ def final_hybrid_decision(row: pd.Series) -> str:
 def apply_hybrid_engine(
     df: pd.DataFrame,
     model: Any | None = None,
-    scaler: Any | None = None,
 ) -> pd.DataFrame:
     """Apply the full hybrid engine pipeline to an enriched DataFrame.
 
@@ -239,8 +227,6 @@ def apply_hybrid_engine(
         Rule-engine-enriched DataFrame.
     model : sklearn estimator, optional
         Pre-trained classifier.  Loaded from disk if not supplied.
-    scaler : sklearn transformer, optional
-        Fitted scaler.  Loaded from disk if not supplied.
 
     Returns
     -------
@@ -248,7 +234,7 @@ def apply_hybrid_engine(
         A **copy** of *df* with ``ml_probability`` and ``final_risk``.
     """
     # Step 1: Add ML probability column
-    result = predict_ml_probability(df, model=model, scaler=scaler)
+    result = predict_ml_probability(df, model=model)
 
     # Step 2: Apply hybrid decision row-wise
     result["final_risk"] = result.apply(final_hybrid_decision, axis=1)

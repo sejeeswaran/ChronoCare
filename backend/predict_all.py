@@ -27,6 +27,7 @@ import pandas as pd
 
 from predict_diabetes import predict_diabetes_risk
 from predict_hypertension import predict_hypertension_risk
+from predict_ckd import predict_ckd_risk
 
 
 # ---------------------------------------------------------------------------
@@ -48,8 +49,14 @@ def predict_all_risks(
         Patient observations.  Must contain the columns required by
         **each** disease predictor:
 
-        - Diabetes:      ``age``, ``fasting_glucose``, ``hba1c``
+        - Diabetes:      ``Pregnancies``, ``Glucose``, ``BloodPressure``,
+                         ``SkinThickness``, ``Insulin``, ``BMI``,
+                         ``DiabetesPedigreeFunction``, ``Age``
         - Hypertension:  ``age``, ``systolic_bp``, ``diastolic_bp``
+        - CKD:           ``age``, ``bp``, ``sg``, ``al``, ``su``, ``rbc``,
+                         ``pc``, ``pcc``, ``ba``, ``bgr``, ``bu``, ``sc``,
+                         ``sod``, ``pot``, ``hemo``, ``pcv``, ``wc``, ``rc``,
+                         ``htn``, ``dm``, ``cad``, ``appet``, ``pe``, ``ane``
 
         Columns not required by a particular model are ignored by
         that model.  The original DataFrame is **never** modified.
@@ -57,7 +64,7 @@ def predict_all_risks(
     Returns
     -------
     dict[str, float | list[float]]
-        ``{"diabetes_risk": ..., "hypertension_risk": ...}``
+        ``{"diabetes_risk": ..., "hypertension_risk": ..., "ckd_risk": ...}``
 
         Each value is a ``float`` for single-row input or a
         ``list[float]`` for multi-row input.
@@ -79,4 +86,5 @@ def predict_all_risks(
     return {
         "diabetes_risk": predict_diabetes_risk(df),
         "hypertension_risk": predict_hypertension_risk(df),
+        "ckd_risk": predict_ckd_risk(df),
     }
