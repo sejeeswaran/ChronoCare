@@ -22,3 +22,15 @@ venv/
 # OS
 Thumbs.db
 .DS_Store
+
+# Credentials — NEVER commit
+backend/drive_key.json
+backend/credentials/
+
+# Node
+node_modules/
+frontend/dist/
+
+# Temp
+check_drive.py
+test_report.csv

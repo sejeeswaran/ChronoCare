@@ -1,0 +1,38 @@
+[
+  {
+    "id": "f8b7089f-33b3-4cc2-84b0-9eabb7180264",
+    "name": "Alice",
+    "email": "alice@test.com",
+    "password_hash": "$2b$12$f5dgCQNmMwqn6/By3584we0/XwceaiQRRtnqry1sB0t7dm0aoPLkS",
+    "role": "patient",
+    "patient_id": "PAT-1001",
+    "created_at": "2026-02-27T23:33:28.680395+00:00"
+  },
+  {
+    "id": "077232ef-2350-4fba-bb6b-09f4497c83ed",
+    "name": "Dr. Bob",
+    "email": "dr@test.com",
+    "password_hash": "$2b$12$vzXWSY9tpsYnLtwWqRpj3OQ4qAGrmqW.sHsiCSsIsRFAuEIiHQyZ.",
+    "role": "doctor",
+    "patient_id": null,
+    "created_at": "2026-02-27T23:34:32.100957+00:00"
+  },
+  {
+    "id": "e4827fc3-cb86-4b6c-8ff7-ef517c40f6c3",
+    "name": "Dr.",
+    "email": "dr@gmail.com",
+    "password_hash": "$2b$12$j3aKsf5KP8MFA519VPWDGeutT/DWeRcE7aCjD6VgPzWMnhuEpAB5q",
+    "role": "doctor",
+    "patient_id": null,
+    "created_at": "2026-02-27T23:41:41.695215+00:00"
+  },
+  {
+    "id": "df48081d-46d4-4600-930f-268840eeddb0",
+    "name": "Sejee",
+    "email": "ksa@gmail.com",
+    "password_hash": "$2b$12$4S6dgKJk1n0VgldhqR.l1eg53R1tSVSw0v/7Z.TWEGvQP4RCcLUMW",
+    "role": "patient",
+    "patient_id": "PAT-1002",
+    "created_at": "2026-02-27T23:44:04.362272+00:00"
+  }
+]

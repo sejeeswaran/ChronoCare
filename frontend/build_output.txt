@@ -1,0 +1,29 @@
+
+> frontend@0.0.0 build
+> vite build
+
+[36mvite v7.3.1 [32mbuilding client environment for production...[36m[39m
+transforming...
+[32mΓ£ô[39m 2441 modules transformed.
+Γ£ù Build failed in 2.87s
+error during build:
+src/layout/Sidebar.jsx (3:61): "BellAlert" is not exported by "node_modules/lucide-react/dist/esm/lucide-react.js", imported by "src/layout/Sidebar.jsx".
+file: D:/chronocare/frontend/src/layout/Sidebar.jsx:3:61
+
+1: import React from 'react';
+2: import { NavLink } from 'react-router-dom';
+3: import { LayoutDashboard, FileUp, ActivitySquare, LineChart, BellAlert, Stethoscope } from 'lucide-react';
+                                                                ^
+4: 
+5: const navItems = [
+
+    at getRollupError (file:///D:/chronocare/frontend/node_modules/rollup/dist/es/shared/parseAst.js:402:41)
+    at error (file:///D:/chronocare/frontend/node_modules/rollup/dist/es/shared/parseAst.js:398:42)
+    at Module.error (file:///D:/chronocare/frontend/node_modules/rollup/dist/es/shared/node-entry.js:17040:16)
+    at Module.traceVariable (file:///D:/chronocare/frontend/node_modules/rollup/dist/es/shared/node-entry.js:17452:29)
+    at ModuleScope.findVariable (file:///D:/chronocare/frontend/node_modules/rollup/dist/es/shared/node-entry.js:15070:39)
+    at Identifier.bind (file:///D:/chronocare/frontend/node_modules/rollup/dist/es/shared/node-entry.js:5447:40)
+    at Property.bind (file:///D:/chronocare/frontend/node_modules/rollup/dist/es/shared/node-entry.js:2829:23)
+    at ObjectExpression.bind (file:///D:/chronocare/frontend/node_modules/rollup/dist/es/shared/node-entry.js:2825:28)
+    at ArrayExpression.bind (file:///D:/chronocare/frontend/node_modules/rollup/dist/es/shared/node-entry.js:2825:28)
+    at VariableDeclarator.bind (file:///D:/chronocare/frontend/node_modules/rollup/dist/es/shared/node-entry.js:2829:23)

@@ -1,0 +1,99 @@
+P:\Innoverse\backend\test_engine.py:152: UserWarning: Skipping 'nonexistent_disease': not in registry.
+  results = predict_risks(df, selected_diseases=["nonexistent_disease"])
+============================================================
+TEST 1 -- selected_diseases = 'all'
+============================================================
+{
+  "diabetes": {
+    "probability": 0.3267,
+    "rule_score": 20,
+    "risk_level": "Moderate Risk",
+    "trend": "Deteriorating",
+    "alert": "WARNING"
+  },
+  "hypertension": {
+    "probability": 0.4633,
+    "rule_score": 20,
+    "risk_level": "Moderate Risk",
+    "trend": "Deteriorating",
+    "alert": "WARNING"
+  },
+  "ckd": {
+    "probability": 0.9,
+    "rule_score": 40,
+    "risk_level": "High Risk",
+    "trend": "Stable",
+    "alert": "STABLE"
+  },
+  "cardio": {
+    "probability": 0.8582,
+    "rule_score": 50,
+    "risk_level": "High Risk",
+    "trend": "Deteriorating",
+    "alert": "CRITICAL ALERT"
+  }
+}
+
+[PASS]  TEST 1 PASSED
+
+============================================================
+TEST 2 -- selected_diseases = ['diabetes']
+============================================================
+{
+  "diabetes": {
+    "probability": 0.3267,
+    "rule_score": 20,
+    "risk_level": "Moderate Risk",
+    "trend": "Deteriorating",
+    "alert": "WARNING"
+  }
+}
+
+[PASS]  TEST 2 PASSED
+
+============================================================
+TEST 3 -- selected_diseases = ['nonexistent_disease']
+============================================================
+{}
+
+[PASS]  TEST 3 PASSED
+
+============================================================
+TEST 4 -- selected_diseases = None (default)
+============================================================
+{
+  "diabetes": {
+    "probability": 0.3267,
+    "rule_score": 20,
+    "risk_level": "Moderate Risk",
+    "trend": "Deteriorating",
+    "alert": "WARNING"
+  },
+  "hypertension": {
+    "probability": 0.4633,
+    "rule_score": 20,
+    "risk_level": "Moderate Risk",
+    "trend": "Deteriorating",
+    "alert": "WARNING"
+  },
+  "ckd": {
+    "probability": 0.9,
+    "rule_score": 40,
+    "risk_level": "High Risk",
+    "trend": "Stable",
+    "alert": "STABLE"
+  },
+  "cardio": {
+    "probability": 0.8582,
+    "rule_score": 50,
+    "risk_level": "High Risk",
+    "trend": "Deteriorating",
+    "alert": "CRITICAL ALERT"
+  }
+}
+
+[PASS]  TEST 4 PASSED
+
+============================================================
+ALL TESTS PASSED
+============================================================

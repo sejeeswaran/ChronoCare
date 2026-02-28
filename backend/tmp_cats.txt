@@ -1,0 +1,1 @@
+[array(['Hypertension', 'Normal', 'Prehypertension'], dtype=object), array(['ACE Inhibitor', 'Beta Blocker', 'Diuretic', 'Other'], dtype=object), array(['No', 'Yes'], dtype=object), array(['High', 'Low', 'Moderate'], dtype=object), array(['Non-Smoker', 'Smoker'], dtype=object)]

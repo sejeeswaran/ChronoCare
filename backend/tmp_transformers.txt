@@ -1,0 +1,4 @@
+num ['Bp', 'Sg', 'Al', 'Su', 'Rbc', 'Bu', 'Sc', 'Sod', 'Pot', 'Hemo', 'Wbcc', 'Rbcc', 'Htn']
+cat []
+num ['Age', 'Salt_Intake', 'Stress_Score', 'Sleep_Duration', 'BMI']
+cat ['BP_History', 'Medication', 'Family_History', 'Exercise_Level', 'Smoking_Status']

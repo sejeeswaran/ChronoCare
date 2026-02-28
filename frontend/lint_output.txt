@@ -1,0 +1,107 @@
+
+> frontend@0.0.0 lint
+> eslint .
+
+
+D:\chronocare\frontend\src\components\DiseaseCard.jsx
+  17:55  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+  15 |     // Mock historical data for sparkline to give the dashboard a "live" feel
+  16 |     const mockData = Array.from({ length: 15 }, (_, i) => ({
+> 17 |         value: Math.max(0, Math.min(100, riskScore + (Math.random() * 10 - 5) - (15 - i) * (trendStatus === 'Deteriorating' ? -1 : 0)))
+     |                                                       ^^^^^^^^^^^^^ Cannot call impure function
+  18 |     }));
+  19 |
+  20 |     const formatName = (str) => {  react-hooks/purity
+
+D:\chronocare\frontend\src\context\HealthDataContext.jsx
+  35:14  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+D:\chronocare\frontend\src\pages\AlertsCenter.jsx
+  16:21  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+  14 |             .filter(d => d.alert)
+  15 |             .map(d => ({
+> 16 |                 id: Math.random().toString(36).substr(2, 9),
+     |                     ^^^^^^^^^^^^^ Cannot call impure function
+  17 |                 disease: d.disease_name,
+  18 |                 severity: d.alert.severity,
+  19 |                 message: d.alert.message,             react-hooks/purity
+  30:33  error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+  28 |             severity: i % 2 === 0 ? 'Warning' : 'Critical',
+  29 |             message: `Historical alert pattern detected for ${d}.`,
+> 30 |             timestamp: new Date(Date.now() - (i + 1) * 86400000).toISOString(),
+     |                                 ^^^^^^^^^^ Cannot call impure function
+  31 |             status: 'Resolved'
+  32 |         }));
+  33 |  react-hooks/purity
+
+D:\chronocare\frontend\src\pages\Dashboard.jsx
+  15:11  warning  The 'diseases' logical expression could make the dependencies of useMemo Hook (at line 27) change on every render. To fix this, wrap the initialization of 'diseases' in its own useMemo() Hook                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                react-hooks/exhaustive-deps
+  15:11  warning  The 'diseases' logical expression could make the dependencies of useMemo Hook (at line 72) change on every render. To fix this, wrap the initialization of 'diseases' in its own useMemo() Hook                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                react-hooks/exhaustive-deps
+  52:30  error    React Hook "useMemo" is called conditionally. React Hooks must be called in the exact same order in every component render                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     react-hooks/rules-of-hooks
+  62:49  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+  60 |
+  61 |                 // Random drift to make the chart look realistic, converging on actual today
+> 62 |                 const variance = i === 0 ? 0 : (Math.random() * 10 - 5);
+     |                                                 ^^^^^^^^^^^^^ Cannot call impure function
+  63 |
+  64 |                 data.push({
+  65 |                     date: dDate.toISOString(),  react-hooks/purity
+
+D:\chronocare\frontend\src\pages\DiseaseDetail.jsx
+  45:55  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+  43 |     const mockRiskTimeline = Array.from({ length: 30 }, (_, i) => ({
+  44 |         day: `Day ${i + 1}`,
+> 45 |         risk: Math.max(0, Math.min(100, risk_score + (Math.random() * 20 - 10)))
+     |                                                       ^^^^^^^^^^^^^ Cannot call impure function
+  46 |     }));
+  47 |
+  48 |     const mockBiomarkers = Array.from({ length: 10 }, (_, i) => ({  react-hooks/purity
+  50:23  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+  48 |     const mockBiomarkers = Array.from({ length: 10 }, (_, i) => ({
+  49 |         date: `Test ${i + 1}`,
+> 50 |         value1: 100 + Math.random() * 40,
+     |                       ^^^^^^^^^^^^^ Cannot call impure function
+  51 |         value2: 80 + Math.random() * 20
+  52 |     }));
+  53 |                                                                                                    react-hooks/purity
+  51:22  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+  49 |         date: `Test ${i + 1}`,
+  50 |         value1: 100 + Math.random() * 40,
+> 51 |         value2: 80 + Math.random() * 20
+     |                      ^^^^^^^^^^^^^ Cannot call impure function
+  52 |     }));
+  53 |
+  54 |     return (                                                                                                                                                           react-hooks/purity
+
+D:\chronocare\frontend\src\pages\TimelineView.jsx
+  1:17  error  'useState' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+D:\chronocare\frontend\src\pages\WearableInsights.jsx
+  123:49  error  'Icon' is defined but never used  no-unused-vars
+
+D:\chronocare\frontend\src\services\api.js
+  34:14  error  'error' is defined but never used  no-unused-vars
+
+Γ£û 14 problems (12 errors, 2 warnings)
+
