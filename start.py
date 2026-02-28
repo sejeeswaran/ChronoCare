@@ -21,7 +21,7 @@ def main():
         [sys.executable, "app.py"],
         cwd=project_root,
         stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL
+        stderr=None
     )
     time.sleep(2)
     print("✅ Backend API initialized")
