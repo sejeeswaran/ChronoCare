@@ -41,6 +41,41 @@ DEFAULT_VALUES = {
 }
 
 
+def _apply_cross_field_mappings(row: Dict[str, Any], enriched_row: Dict[str, Any]) -> None:
+    """Apply cross-field mappings for a single row based on the inputs provided."""
+    # Age ↔ age  (diabetes/hypertension use "Age", cardio uses "age")
+    if "Age" in row:
+        enriched_row["age"] = float(row["Age"])
+    elif "age" in row:
+        enriched_row["Age"] = float(row["age"])
+
+    # BloodPressure → Bp (CKD) & trestbps (Cardio)
+    if "BloodPressure" in row:
+        val = float(row["BloodPressure"])
+        enriched_row["Bp"] = val
+        enriched_row["trestbps"] = val
+    elif "Bp" in row:
+        val = float(row["Bp"])
+        enriched_row["BloodPressure"] = val
+        enriched_row["trestbps"] = val
+    elif "trestbps" in row:
+        val = float(row["trestbps"])
+        enriched_row["BloodPressure"] = val
+        enriched_row["Bp"] = val
+
+    # Glucose → fbs (Cardio)
+    if "Glucose" in row:
+        val = float(row["Glucose"])
+        enriched_row["fbs"] = 1 if val > 120 else 0
+
+    # BMI sync
+    if "BMI" in row:
+        enriched_row["BMI"] = float(row["BMI"])
+
+    # ── Date for time engine ──────────────────────────────────
+    enriched_row["date"] = row.get("date") or row.get("Date") or datetime.now().strftime("%Y-%m-%d")
+
+
 def enrich_patient_data(patient_data_list: List[Dict[str, Any]]) -> pd.DataFrame:
     """Transform sparse frontend data into a fully populated DataFrame.
 
@@ -54,45 +89,12 @@ def enrich_patient_data(patient_data_list: List[Dict[str, Any]]) -> pd.DataFrame
 
     for row in patient_data_list:
         enriched_row = DEFAULT_VALUES.copy()
-
+        
         # Merge frontend data (overrides defaults)
-        for k, v in row.items():
-            enriched_row[k] = v
+        enriched_row.update(row)
 
-        # ── Cross-field mappings ──────────────────────────────────
-
-        # Age ↔ age  (diabetes/hypertension use "Age", cardio uses "age")
-        if "Age" in row:
-            enriched_row["age"] = float(row["Age"])
-        elif "age" in row:
-            enriched_row["Age"] = float(row["age"])
-
-        # BloodPressure → Bp (CKD) & trestbps (Cardio)
-        if "BloodPressure" in row:
-            val = float(row["BloodPressure"])
-            enriched_row["Bp"] = val
-            enriched_row["trestbps"] = val
-        elif "Bp" in row:
-            enriched_row["BloodPressure"] = float(row["Bp"])
-            enriched_row["trestbps"] = float(row["Bp"])
-        elif "trestbps" in row:
-            enriched_row["BloodPressure"] = float(row["trestbps"])
-            enriched_row["Bp"] = float(row["trestbps"])
-
-        # Glucose → fbs (Cardio)
-        if "Glucose" in row:
-            val = float(row["Glucose"])
-            enriched_row["fbs"] = 1 if val > 120 else 0
-
-        # BMI sync
-        if "BMI" in row:
-            enriched_row["BMI"] = float(row["BMI"])
-
-        # ── Date for time engine ──────────────────────────────────
-        if "date" not in row and "Date" not in row:
-            enriched_row["date"] = datetime.now().strftime("%Y-%m-%d")
-        else:
-            enriched_row["date"] = row.get("date", row.get("Date"))
+        # Apply specific mappings
+        _apply_cross_field_mappings(row, enriched_row)
 
         enriched_data.append(enriched_row)
 
