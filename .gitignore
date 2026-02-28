@@ -33,7 +33,6 @@ frontend/dist/
 
 # Temp
 check_drive.py
-test_report.csv
 
 # Cache & local data
 frontend/.vite/

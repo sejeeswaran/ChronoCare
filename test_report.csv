@@ -1,0 +1,2 @@
+Age,Glucose,BloodPressure,SkinThickness,Insulin,BMI,DiabetesPedigreeFunction,Pregnancies,chol,trestbps,thalach,Hemoglobin,Creatinine
+52,180,92,28,150,31.2,0.471,3,240,130,160,13.5,1.2
