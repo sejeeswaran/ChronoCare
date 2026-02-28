@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import PropTypes from 'prop-types';
 
 const AuthContext = createContext(null);
 
@@ -89,16 +90,22 @@ export function AuthProvider({ children }) {
     const isPatient = user?.role === 'patient';
     const isAuthenticated = !!token && !!user;
 
+    const contextValue = useMemo(() => ({
+        user, token, loading,
+        login, signup, logout,
+        isDoctor, isPatient, isAuthenticated,
+    }), [user, token, loading, login, signup, logout, isDoctor, isPatient, isAuthenticated]);
+
     return (
-        <AuthContext.Provider value={{
-            user, token, loading,
-            login, signup, logout,
-            isDoctor, isPatient, isAuthenticated,
-        }}>
+        <AuthContext.Provider value={contextValue}>
             {children}
         </AuthContext.Provider>
     );
 }
+
+AuthProvider.propTypes = {
+    children: PropTypes.node.isRequired,
+};
 
 export function useAuth() {
     const ctx = useContext(AuthContext);

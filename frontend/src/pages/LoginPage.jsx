@@ -158,9 +158,9 @@ export default function LoginPage() {
                         {/* Role selector (signup only) */}
                         {mode === 'signup' && (
                             <div>
-                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                                <div className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
                                     I am a
-                                </label>
+                                </div>
                                 <div className="grid grid-cols-2 gap-3">
                                     <button
                                         type="button"
