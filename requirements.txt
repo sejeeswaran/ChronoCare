@@ -1,0 +1,14 @@
+flask
+flask-cors
+pandas
+numpy
+scikit-learn
+pdfplumber
+openpyxl
+xgboost
+fpdf2
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
+PyJWT
+bcrypt
