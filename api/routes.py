@@ -316,17 +316,14 @@ def predict():
             patient_id = request.user.get('patient_id', 'UNKNOWN')
         else:
             patient_id = data.get('patient_id', 'UNKNOWN')
-        import threading
-        def _bg_save():
-            try:
-                save_analysis(
-                    patient_id=patient_id,
-                    results=results,
-                    input_data=patient_data_list[0] if patient_data_list else {},
-                )
-            except Exception:
-                pass  # Never let storage failure affect anything
-        threading.Thread(target=_bg_save, daemon=True).start()
+        try:
+            save_analysis(
+                patient_id=patient_id,
+                results=results,
+                input_data=patient_data_list[0] if patient_data_list else {},
+            )
+        except Exception as e:
+            print(f"Warning: Background save failed: {e}")
 
         return jsonify({**results, "__storage": {"stored": True, "backend": "async"}}), 200
 

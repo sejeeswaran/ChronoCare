@@ -72,6 +72,12 @@ export default function ClinicalUpload() {
 
     // ── Fetch config on mount ──
     useEffect(() => {
+        if (isPatient && user?.patient_id) {
+            setPatientId(user.patient_id);
+        }
+    }, [user, isPatient]);
+
+    useEffect(() => {
         const loadConfig = async () => {
             try {
                 const config = await fetchDiseaseConfig();

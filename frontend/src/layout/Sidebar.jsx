@@ -10,7 +10,7 @@ export default function Sidebar() {
     const navItems = [
         { path: '/', label: 'Dashboard', icon: LayoutDashboard, show: true },
         { path: '/upload', label: 'Clinical Upload', icon: FileUp, show: true },
-        { path: '/wearables', label: 'Wearable Insights', icon: ActivitySquare, show: true },
+        { path: '/wearables', label: 'Wearable Insights', icon: ActivitySquare, show: !isDoctor },
         { path: '/timeline', label: 'Timeline Intelligence', icon: LineChart, show: true },
         { path: '/alerts', label: 'Alerts Center', icon: Bell, show: true },
     ];
@@ -48,8 +48,8 @@ export default function Sidebar() {
                 <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-3">
                     <div className="flex items-center gap-3">
                         <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${isDoctor
-                                ? 'bg-violet-100 text-violet-600'
-                                : 'bg-blue-100 text-blue-600'
+                            ? 'bg-violet-100 text-violet-600'
+                            : 'bg-blue-100 text-blue-600'
                             }`}>
                             {isDoctor ? <Stethoscope size={18} /> : <User size={18} />}
                         </div>
@@ -59,8 +59,8 @@ export default function Sidebar() {
                             </p>
                             <div className="flex items-center gap-1.5 mt-0.5">
                                 <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase ${isDoctor
-                                        ? 'bg-violet-100 text-violet-700'
-                                        : 'bg-blue-100 text-blue-700'
+                                    ? 'bg-violet-100 text-violet-700'
+                                    : 'bg-blue-100 text-blue-700'
                                     }`}>
                                     {user?.role || 'User'}
                                 </span>

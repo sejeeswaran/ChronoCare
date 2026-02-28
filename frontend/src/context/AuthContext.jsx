@@ -84,6 +84,8 @@ export function AuthProvider({ children }) {
     const logout = useCallback(() => {
         setToken(null);
         setUser(null);
+        // Force a page reload to nuke the mounted HealthDataContext preventing cross-session data bleeding
+        window.location.reload();
     }, []);
 
     const isDoctor = user?.role === 'doctor';

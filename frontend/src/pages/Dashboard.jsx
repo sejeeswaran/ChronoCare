@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useHealthData } from '../context/HealthDataContext';
+import { useAuth } from '../context/AuthContext';
 import { Activity, Bell, FileText, HeartPulse } from 'lucide-react';
 
 import GlobalRiskGauge from '../components/GlobalRiskGauge';
@@ -11,6 +12,7 @@ import RiskTimelineChart from '../components/RiskTimelineChart';
 export default function Dashboard() {
     const navigate = useNavigate();
     const { patientData, globalRisk } = useHealthData();
+    const { user } = useAuth();
 
     const diseases = patientData?.activated_diseases || [];
 
@@ -78,7 +80,7 @@ export default function Dashboard() {
             <div className="flex items-center justify-between mb-2">
                 <div>
                     <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Intelligence Dashboard</h1>
-                    <p className="text-sm font-medium text-slate-500">Patient: <span className="text-slate-700 font-bold">{patientData.patient_id}</span></p>
+                    <p className="text-sm font-medium text-slate-500">Patient: <span className="text-slate-700 font-bold">{patientData.patient_id || user?.patient_id}</span></p>
                 </div>
             </div>
 

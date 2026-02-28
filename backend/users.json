@@ -34,5 +34,41 @@
     "role": "patient",
     "patient_id": "PAT-1002",
     "created_at": "2026-02-27T23:44:04.362272+00:00"
+  },
+  {
+    "id": "1afe9eeb-f458-4781-91d1-df809d109ca5",
+    "name": "Arish",
+    "email": "a@gmail.com",
+    "password_hash": "$2b$12$.teuoKJ2tfAtu3RnuozMFOEyXqM7aVvXXHLFCtcwl0kqME8SxYSDi",
+    "role": "patient",
+    "patient_id": "PAT-1003",
+    "created_at": "2026-02-28T04:32:15.081058+00:00"
+  },
+  {
+    "id": "5db50e6e-3d9e-4933-88a5-e77f5bb70eb1",
+    "name": "bala",
+    "email": "bala@gmail.com",
+    "password_hash": "$2b$12$P3hyakhxeNlpdqlwTyv0ququd9je3dBpMyaQEec9s6rqR3JUJ.4yu",
+    "role": "patient",
+    "patient_id": "PAT-1004",
+    "created_at": "2026-02-28T04:40:20.499610+00:00"
+  },
+  {
+    "id": "f370664a-0dc5-4884-8391-54911d138ef7",
+    "name": "barath",
+    "email": "b@gmail.com",
+    "password_hash": "$2b$12$.HbhxqFSZ6P54VrQDK0ade0rsQg4n/wvSeqcCHSWo247HySHZ2b2u",
+    "role": "patient",
+    "patient_id": "PAT-1005",
+    "created_at": "2026-02-28T04:42:37.937200+00:00"
+  },
+  {
+    "id": "42be4854-bbb9-4a86-85be-bd7b11b00b4f",
+    "name": "Giri",
+    "email": "giri@gmail.com",
+    "password_hash": "$2b$12$4s0CEd3kURuIrRa2wczgauawjJUBYUCDnVLjSCEJLoY0L7Svjl4zi",
+    "role": "patient",
+    "patient_id": "PAT-1006",
+    "created_at": "2026-02-28T04:47:11.551215+00:00"
   }
 ]
