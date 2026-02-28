@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'http://127.0.0.1:5000/api';
 
 const apiClient = axios.create({
     baseURL: API_BASE_URL,
@@ -40,6 +40,7 @@ export const fetchDiseaseConfig = async () => {
         const response = await apiClient.get('/disease-config');
         return response.data;
     } catch (error) {
+        console.error('Failed to fetch disease config:', error);
         throw new Error('Failed to fetch disease config from backend');
     }
 };
@@ -53,7 +54,7 @@ export const analyzeHealthData = async (patientId, clinicalData, wearableData, s
                 {
                     patient_id: patientId,
                     ...clinicalData,
-                    ...(wearableData || {})
+                    ...wearableData
                 }
             ],
             selected_diseases: (selectedDiseases && selectedDiseases.length > 0) ? selectedDiseases : null
@@ -108,16 +109,17 @@ export const exportPDF = async (patientId, results, inputData = {}) => {
         });
 
         // Trigger browser download
-        const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+        const url = globalThis.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
         const link = document.createElement('a');
         link.href = url;
         link.download = `ChronoCare_Report_${patientId}.pdf`;
         document.body.appendChild(link);
         link.click();
         link.remove();
-        window.URL.revokeObjectURL(url);
+        globalThis.URL.revokeObjectURL(url);
         return true;
     } catch (error) {
+        console.error('Failed to export PDF:', error);
         throw new Error('Failed to generate PDF report');
     }
 };
@@ -141,6 +143,7 @@ export const fetchPatientList = async () => {
         const response = await apiClient.get('/patients');
         return response.data;
     } catch (error) {
+        console.debug('Failed to fetch patient list (expected for patients):', error);
         // Silently fail for patients (they don't have access)
         return { patient_ids: [], count: 0 };
     }
@@ -152,6 +155,7 @@ export const fetchStorageStatus = async () => {
         const response = await apiClient.get('/storage-status');
         return response.data;
     } catch (error) {
+        console.warn('Storage status check failed:', error);
         return { google_drive_connected: false, fallback: 'local' };
     }
 };

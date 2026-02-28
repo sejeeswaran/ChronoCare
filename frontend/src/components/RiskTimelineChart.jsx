@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import PropTypes from 'prop-types';
 
 const DISEASE_COLORS = {
     diabetes: '#3b82f6',    // blue
@@ -90,3 +91,7 @@ export default function RiskTimelineChart({ data }) {
         </ResponsiveContainer>
     );
 }
+
+RiskTimelineChart.propTypes = {
+    data: PropTypes.array.isRequired
+};

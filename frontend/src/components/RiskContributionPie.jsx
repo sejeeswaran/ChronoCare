@@ -4,6 +4,15 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recha
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
 export default function RiskContributionPie({ data }) {
+    // Format name nicely
+    const formattedData = React.useMemo(() => {
+        if (!data) return [];
+        return data.map(d => ({
+            ...d,
+            formattedName: d.disease_name.charAt(0).toUpperCase() + d.disease_name.slice(1)
+        }));
+    }, [data]);
+
     if (!data || data.length === 0) {
         return (
             <div className="flex h-full w-full items-center justify-center text-slate-400 text-sm font-medium">
@@ -11,12 +20,6 @@ export default function RiskContributionPie({ data }) {
             </div>
         );
     }
-
-    // Format name nicely
-    const formattedData = data.map(d => ({
-        ...d,
-        formattedName: d.disease_name.charAt(0).toUpperCase() + d.disease_name.slice(1)
-    }));
 
     return (
         <ResponsiveContainer width="100%" height="100%">

@@ -265,45 +265,39 @@ def save_analysis(patient_id: str, results: dict, input_data: dict = None) -> di
 # ══════════════════════════════════════════════════════════════════════
 #  FETCH –– get_patient_history()  (for timeline)
 # ══════════════════════════════════════════════════════════════════════
-def get_patient_history(patient_id: str) -> list:
-    """Retrieve all historical analysis records for a patient.
-
-    Tries Google Drive first → falls back to local.
-    Returns list of records sorted by timestamp.
-    """
-    records = []
-
-    # ── Try Drive first ──
+def _fetch_drive_history(patient_id: str, records: list):
     folder_id = create_patient_folder(patient_id)
-    if folder_id and _drive_available:
-        try:
-            from googleapiclient.http import MediaIoBaseDownload
+    if not folder_id or not _drive_available:
+        return False
+    
+    try:
+        from googleapiclient.http import MediaIoBaseDownload
+        service = get_drive_service()
+        file_list = list_patient_files(folder_id)
 
-            service = get_drive_service()
-            file_list = list_patient_files(folder_id)
+        for file_info in file_list:
+            if not file_info["name"].endswith(".json"):
+                continue
 
-            for file_info in file_list:
-                if not file_info["name"].endswith(".json"):
-                    continue
+            request = service.files().get_media(fileId=file_info["id"])
+            buf = io.BytesIO()
+            downloader = MediaIoBaseDownload(buf, request)
+            done = False
+            while not done:
+                _, done = downloader.next_chunk()
+            buf.seek(0)
+            data = json.loads(buf.read().decode("utf-8"))
+            records.append(data)
 
-                request = service.files().get_media(fileId=file_info["id"])
-                buf = io.BytesIO()
-                downloader = MediaIoBaseDownload(buf, request)
-                done = False
-                while not done:
-                    _, done = downloader.next_chunk()
-                buf.seek(0)
-                data = json.loads(buf.read().decode("utf-8"))
-                records.append(data)
+        if records:
+            records.sort(key=lambda r: r.get("timestamp", ""))
+            return True
 
-            if records:
-                records.sort(key=lambda r: r.get("timestamp", ""))
-                return records
+    except Exception as e:
+        logger.warning("Drive fetch failed: %s — falling back to local.", e)
+        return False
 
-        except Exception as e:
-            logger.warning("Drive fetch failed: %s — falling back to local.", e)
-
-    # ── Fallback: local storage ──
+def _fetch_local_history(patient_id: str, records: list):
     folder_name = patient_id if patient_id.startswith("PAT") else f"PAT_{patient_id}"
     patient_dir = _LOCAL_HISTORY_DIR / folder_name
     if patient_dir.exists():
@@ -313,6 +307,21 @@ def get_patient_history(patient_id: str) -> list:
                     records.append(json.load(fp))
             except Exception:
                 continue
+
+def get_patient_history(patient_id: str) -> list:
+    """Retrieve all historical analysis records for a patient.
+
+    Tries Google Drive first → falls back to local.
+    Returns list of records sorted by timestamp.
+    """
+    records = []
+
+    # ── Try Drive first ──
+    if _fetch_drive_history(patient_id, records):
+        return records
+
+    # ── Fallback: local storage ──
+    _fetch_local_history(patient_id, records)
 
     records.sort(key=lambda r: r.get("timestamp", ""))
     return records

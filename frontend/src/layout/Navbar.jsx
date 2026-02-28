@@ -4,6 +4,14 @@ import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
   const { user } = useAuth();
+
+  let initial = 'U';
+  if (user?.name) {
+    initial = user.name.charAt(0);
+  } else if (user?.role) {
+    initial = user.role.charAt(0);
+  }
+
   return (
     <nav className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 z-50 flex items-center justify-between px-6">
 
@@ -38,7 +46,7 @@ export default function Navbar() {
           </button>
 
           <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm ml-2 uppercase">
-            {user?.name ? user.name.charAt(0) : (user?.role ? user.role.charAt(0) : 'U')}
+            {initial}
           </div>
         </div>
       </div>

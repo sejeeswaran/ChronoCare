@@ -13,6 +13,7 @@ import uuid
 import logging
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
+from typing import Optional
 
 import bcrypt
 import jwt
@@ -298,7 +299,7 @@ def verify_token(token: str) -> dict:
         raise ValueError("Invalid token")
 
 
-def get_user_by_id(user_id: str) -> dict:
+def get_user_by_id(user_id: str) -> Optional[dict]:
     """Look up user by ID. Returns user dict (without password) or None."""
     users = _load_users()
     user = next((u for u in users if u["id"] == user_id), None)

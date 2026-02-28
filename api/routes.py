@@ -101,13 +101,59 @@ def _resolve_header(raw_header: str):
     return FIELD_ALIASES.get(key)
 
 
-def _extract_from_pdf(filepath: str) -> dict:
-    """Extract key-value pairs from a PDF medical report.
+def _extract_kv_from_row(row, extracted: dict):
+    if row and len(row) >= 2:
+        mapped = _resolve_header(str(row[0] or ""))
+        val = str(row[-1] or "").strip()
+        if mapped and val:
+            extracted[mapped] = val
 
-    Handles:
-    1. Tables — both tabular (header row + data rows) and key-value pair
-    2. Raw text — "Key: Value" patterns
-    """
+def _parse_key_value_table(table: list, extracted: dict):
+    for row in (table or []):
+        _extract_kv_from_row(row, extracted)
+
+def _parse_tabular_data(table: list, resolved: list, extracted: dict):
+    for data_row in table[1:]:
+        for i, col_name in enumerate(resolved):
+            if col_name and i < len(data_row):
+                val = str(data_row[i] or "").strip()
+                if val and col_name not in extracted:
+                    extracted[col_name] = val
+
+def _parse_pdf_table(table: list, extracted: dict):
+    if not table or len(table) < 2:
+        _parse_key_value_table(table, extracted)
+        return
+
+    headers = [str(h or "").strip() for h in table[0]]
+    resolved = [_resolve_header(h) for h in headers]
+
+    if any(resolved):
+        _parse_tabular_data(table, resolved, extracted)
+    else:
+        _parse_key_value_table(table, extracted)
+
+def _parse_text_lines(full_text: str, extracted: dict):
+    for line in full_text.split("\n"):
+        line = line.strip()
+        if not line:
+            continue
+        for sep in [":", "=", "–"]:
+            if sep in line:
+                parts = line.split(sep, 1)
+                val = parts[1].strip()
+                val_clean = re.sub(
+                    r'\s*(mg/dl|mg/l|mmhg|mm hg|g/dl|meq/l|cells/cumm|million/cmm|%|gm/dl|gm%)\s*$',
+                    '', val, flags=re.IGNORECASE
+                ).strip()
+                mapped = _resolve_header(parts[0])
+                if mapped and val_clean and mapped not in extracted:
+                    extracted[mapped] = val_clean
+                break
+
+
+def _extract_from_pdf(filepath: str) -> dict:
+    """Extract key-value pairs from a PDF medical report."""
     extracted = {}
 
     with pdfplumber.open(filepath) as pdf:
@@ -115,142 +161,71 @@ def _extract_from_pdf(filepath: str) -> dict:
         for page in pdf.pages:
             tables = page.extract_tables()
             for table in tables:
-                if not table or len(table) < 2:
-                    # Try key-value pair mode for single-row tables
-                    for row in (table or []):
-                        if row and len(row) >= 2:
-                            mapped = _resolve_header(str(row[0] or ""))
-                            val = str(row[-1] or "").strip()
-                            if mapped and val:
-                                extracted[mapped] = val
-                    continue
-
-                # --- Tabular mode: header row + data rows ---
-                headers = [str(h or "").strip() for h in table[0]]
-                resolved = [_resolve_header(h) for h in headers]
-
-                # Check if any headers resolve → tabular format
-                if any(resolved):
-                    for data_row in table[1:]:
-                        for i, col_name in enumerate(resolved):
-                            if col_name and i < len(data_row):
-                                val = str(data_row[i] or "").strip()
-                                if val and col_name not in extracted:
-                                    extracted[col_name] = val
-                else:
-                    # Fall back to key-value pair mode
-                    for row in table:
-                        if row and len(row) >= 2:
-                            mapped = _resolve_header(str(row[0] or ""))
-                            val = str(row[-1] or "").strip()
-                            if mapped and val:
-                                extracted[mapped] = val
+                _parse_pdf_table(table, extracted)
 
             text = page.extract_text() or ""
             full_text += text + "\n"
 
         # --- Text pattern extraction ---
-        for line in full_text.split("\n"):
-            line = line.strip()
-            if not line:
-                continue
-            for sep in [":", "=", "–"]:
-                if sep in line:
-                    parts = line.split(sep, 1)
-                    val = parts[1].strip()
-                    val_clean = re.sub(
-                        r'\s*(mg/dl|mg/l|mmhg|mm hg|g/dl|meq/l|cells/cumm|million/cmm|%|gm/dl|gm%)\s*$',
-                        '', val, flags=re.IGNORECASE
-                    ).strip()
-                    mapped = _resolve_header(parts[0])
-                    if mapped and val_clean and mapped not in extracted:
-                        extracted[mapped] = val_clean
-                    break
+        _parse_text_lines(full_text, extracted)
 
     return extracted
 
 
-def _extract_from_excel(filepath: str) -> dict:
-    """Extract data from an Excel file.
+def _extract_kv_from_row_spreadsheet(row, extracted: dict):
+    if row and len(row) >= 2:
+        mapped = _resolve_header(str(row[0] or ""))
+        val = str(row[1] if row[1] is not None else "").strip()
+        if mapped and val:
+            extracted[mapped] = val
 
-    Handles:
-    1. Tabular format — header row with data below (most common)
-    2. Key-value pair format — column A = label, column B = value
-    """
+def _extract_from_tabular_row(data_row: list, resolved: list, extracted: dict):
+    for i, col_name in enumerate(resolved):
+        if col_name and i < len(data_row):
+            val = str(data_row[i] if data_row[i] is not None else "").strip()
+            if val and col_name not in extracted:
+                extracted[col_name] = val
+
+def _parse_tabular_spreadsheet(rows: list, resolved: list, extracted: dict):
+    for data_row in rows[1:]:
+        _extract_from_tabular_row(data_row, resolved, extracted)
+        if extracted:
+            break
+
+def _parse_spreadsheet_rows(rows: list, extracted: dict):
+    if not rows:
+        return
+    
+    headers = [str(h or "").strip() for h in rows[0]]
+    resolved = [_resolve_header(h) for h in headers]
+
+    if any(resolved):
+        _parse_tabular_spreadsheet(rows, resolved, extracted)
+    else:
+        for row in rows:
+            _extract_kv_from_row_spreadsheet(row, extracted)
+
+def _extract_from_excel(filepath: str) -> dict:
+    """Extract data from an Excel file."""
     extracted = {}
 
     wb = openpyxl.load_workbook(filepath, data_only=True)
     for sheet_name in wb.sheetnames:
         ws = wb[sheet_name]
         rows = list(ws.iter_rows(values_only=True))
-        if not rows:
-            continue
-
-        # --- Try tabular mode first: treat row 0 as headers ---
-        headers = [str(h or "").strip() for h in rows[0]]
-        resolved = [_resolve_header(h) for h in headers]
-
-        if any(resolved):
-            # Tabular mode — use first data row (row index 1)
-            for data_row in rows[1:]:
-                for i, col_name in enumerate(resolved):
-                    if col_name and i < len(data_row):
-                        val = str(data_row[i] if data_row[i] is not None else "").strip()
-                        if val and col_name not in extracted:
-                            extracted[col_name] = val
-                # Usually we only need the first patient row
-                if extracted:
-                    break
-        else:
-            # Fall back to key-value pair mode
-            for row in rows:
-                if row and len(row) >= 2:
-                    mapped = _resolve_header(str(row[0] or ""))
-                    val = str(row[1] if row[1] is not None else "").strip()
-                    if mapped and val:
-                        extracted[mapped] = val
+        _parse_spreadsheet_rows(rows, extracted)
 
     return extracted
 
 
 def _extract_from_csv(filepath: str) -> dict:
-    """Extract data from a CSV file.
-
-    Handles:
-    1. Tabular format — header row with data below (most common)
-    2. Key-value pair format — column 0 = label, column 1 = value
-    """
+    """Extract data from a CSV file."""
     extracted = {}
 
     with open(filepath, newline='', encoding='utf-8-sig') as f:
         reader = list(csv.reader(f))
 
-    if not reader:
-        return extracted
-
-    # --- Try tabular mode first: treat row 0 as headers ---
-    headers = [str(h).strip() for h in reader[0]]
-    resolved = [_resolve_header(h) for h in headers]
-
-    if any(resolved):
-        # Tabular mode — iterate data rows
-        for data_row in reader[1:]:
-            for i, col_name in enumerate(resolved):
-                if col_name and i < len(data_row):
-                    val = str(data_row[i]).strip()
-                    if val and col_name not in extracted:
-                        extracted[col_name] = val
-            # Usually we only need the first patient row
-            if extracted:
-                break
-    else:
-        # Fall back to key-value pair mode
-        for row in reader:
-            if row and len(row) >= 2:
-                mapped = _resolve_header(str(row[0]))
-                val = str(row[1]).strip()
-                if mapped and val:
-                    extracted[mapped] = val
+    _parse_spreadsheet_rows(reader, extracted)
 
     return extracted
 
@@ -310,12 +285,14 @@ def disease_config():
 
     return jsonify(config), 200
 
+ERR_NOT_JSON = {"error": "Request must be JSON"}
+
 @api_bp.route('/predict', methods=['POST'])
 @require_auth
 def predict():
     """Main REST prediction endpoint (requires auth)."""
     if not request.is_json:
-        return jsonify({"error": "Request must be JSON"}), 400
+        return jsonify(ERR_NOT_JSON), 400
 
     data = request.get_json()
 
@@ -421,7 +398,7 @@ def export_pdf():
     }
     """
     if not request.is_json:
-        return jsonify({"error": "Request must be JSON"}), 400
+        return jsonify(ERR_NOT_JSON), 400
 
     data = request.get_json()
     patient_id = data.get("patient_id", "UNKNOWN")
@@ -511,7 +488,7 @@ def storage_status():
 def auth_signup_route():
     """Create a new user account."""
     if not request.is_json:
-        return jsonify({"error": "Request must be JSON"}), 400
+        return jsonify(ERR_NOT_JSON), 400
 
     data = request.get_json()
     try:
@@ -532,7 +509,7 @@ def auth_signup_route():
 def auth_login_route():
     """Authenticate and return JWT token."""
     if not request.is_json:
-        return jsonify({"error": "Request must be JSON"}), 400
+        return jsonify(ERR_NOT_JSON), 400
 
     data = request.get_json()
     try:

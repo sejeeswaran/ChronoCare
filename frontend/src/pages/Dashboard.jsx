@@ -26,27 +26,6 @@ export default function Dashboard() {
             });
     }, [diseases]);
 
-    if (!patientData) {
-        return (
-            <div className="flex flex-col items-center justify-center h-[calc(100vh-8rem)] text-center">
-                <div className="w-20 h-20 bg-blue-50 text-primary rounded-full flex items-center justify-center mb-6">
-                    <Activity size={40} />
-                </div>
-                <h2 className="text-2xl font-bold text-slate-800 mb-2">No Active Patient Data</h2>
-                <p className="text-slate-500 max-w-md mb-8">
-                    Upload clinical and wearable telemetry to initialize the multi-disease adaptive pipeline and view the intelligence dashboard.
-                </p>
-                <button
-                    onClick={() => navigate('/upload')}
-                    className="bg-primary text-white font-bold py-3 px-6 rounded-xl shadow-sm hover:shadow-md hover:bg-blue-800 transition-all flex items-center gap-2"
-                >
-                    <FileText size={18} />
-                    <span>Upload Clinical Data</span>
-                </button>
-            </div>
-        );
-    }
-
     // Construct mock timeline data for the chart by extracting current scores 
     // (In a full app, you would fetch the full longitudinal history from backend `/patient/{id}`)
     const mockTimelineData = useMemo(() => {
@@ -70,6 +49,27 @@ export default function Dashboard() {
         });
         return data;
     }, [diseases]);
+
+    if (!patientData) {
+        return (
+            <div className="flex flex-col items-center justify-center h-[calc(100vh-8rem)] text-center">
+                <div className="w-20 h-20 bg-blue-50 text-primary rounded-full flex items-center justify-center mb-6">
+                    <Activity size={40} />
+                </div>
+                <h2 className="text-2xl font-bold text-slate-800 mb-2">No Active Patient Data</h2>
+                <p className="text-slate-500 max-w-md mb-8">
+                    Upload clinical and wearable telemetry to initialize the multi-disease adaptive pipeline and view the intelligence dashboard.
+                </p>
+                <button
+                    onClick={() => navigate('/upload')}
+                    className="bg-primary text-white font-bold py-3 px-6 rounded-xl shadow-sm hover:shadow-md hover:bg-blue-800 transition-all flex items-center gap-2"
+                >
+                    <FileText size={18} />
+                    <span>Upload Clinical Data</span>
+                </button>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col gap-6 max-w-7xl mx-auto">

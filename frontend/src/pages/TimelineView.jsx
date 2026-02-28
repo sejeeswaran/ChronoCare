@@ -114,13 +114,14 @@ export default function TimelineView() {
                 <div className="card p-5 bg-white rounded-xl shadow-sm border border-slate-200">
                     <div className="flex items-center gap-4">
                         <div className="flex-1">
-                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                            <label htmlFor="patientSearchInput" className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
                                 Patient ID
                             </label>
                             <div className="flex gap-3">
                                 <div className="relative flex-1 max-w-sm">
                                     <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                                     <input
+                                        id="patientSearchInput"
                                         type="text"
                                         value={searchInput}
                                         onChange={e => setSearchInput(e.target.value)}
@@ -234,7 +235,7 @@ export default function TimelineView() {
                                         return (
                                             <div key={disease} className={`p-4 rounded-xl border ${colors.bg} ${colors.border}`}>
                                                 <div className={`text-xs font-bold uppercase tracking-wider ${colors.text}`}>
-                                                    {disease.replace(/_/g, ' ')}
+                                                    {disease.replaceAll('_', ' ')}
                                                 </div>
                                                 <div className={`text-2xl font-black mt-1 ${colors.text}`}>{prob}%</div>
                                                 <div className="mt-2 flex items-center gap-2">
@@ -261,7 +262,7 @@ export default function TimelineView() {
                                         Risk Probability Trajectory
                                     </h3>
                                     <span className="text-xs text-slate-400 font-medium">
-                                        {timeline.count} data point{timeline.count !== 1 ? 's' : ''}
+                                        {timeline.count} data point{timeline.count === 1 ? '' : 's'}
                                     </span>
                                 </div>
 
@@ -289,7 +290,7 @@ export default function TimelineView() {
                                                 <th className="px-5 py-3 text-left">#</th>
                                                 <th className="px-5 py-3 text-left">Timestamp</th>
                                                 {diseaseNames.map(d => (
-                                                    <th key={d} className="px-5 py-3 text-center">{d.replace(/_/g, ' ')}</th>
+                                                    <th key={d} className="px-5 py-3 text-center">{d.replaceAll('_', ' ')}</th>
                                                 ))}
                                             </tr>
                                         </thead>
@@ -300,15 +301,17 @@ export default function TimelineView() {
                                                     ? new Date(ts).toLocaleString()
                                                     : ts;
                                                 return (
-                                                    <tr key={idx} className="border-t border-slate-100 hover:bg-slate-50 transition-colors">
+                                                    <tr key={`record-${idx}-${ts}`} className="border-t border-slate-100 hover:bg-slate-50 transition-colors">
                                                         <td className="px-5 py-3 text-slate-400 font-mono text-xs">{idx + 1}</td>
                                                         <td className="px-5 py-3 text-slate-700 font-medium">{dateDisplay}</td>
                                                         {diseaseNames.map(d => {
                                                             const prob = record.results?.[d]?.probability;
-                                                            const pct = prob !== undefined ? (prob * 100).toFixed(1) + '%' : '—';
+                                                            const pct = prob === undefined ? '—' : (prob * 100).toFixed(1) + '%';
                                                             const risk = record.results?.[d]?.risk_level || '';
-                                                            const color = risk === 'High Risk' ? 'text-red-600' :
-                                                                risk === 'Moderate Risk' ? 'text-amber-600' : 'text-emerald-600';
+                                                            let color = 'text-emerald-600';
+                                                            if (risk === 'High Risk') color = 'text-red-600';
+                                                            else if (risk === 'Moderate Risk') color = 'text-amber-600';
+
                                                             return (
                                                                 <td key={d} className={`px-5 py-3 text-center font-bold ${color}`}>
                                                                     {pct}
