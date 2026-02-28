@@ -33,7 +33,8 @@ frontend/dist/
 
 # Temp
 check_drive.py
-
+test_out.txt
+test_upload.py
 # Cache & local data
 frontend/.vite/
 backend/patient_history/
