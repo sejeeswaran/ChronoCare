@@ -2,60 +2,80 @@
 
 **Hybrid Chronic Risk Intelligence Engine**
 
-ChronoCare AI is an advanced, full-stack medical intelligence platform that predicts, detects, and tracks chronic disease risks (including Diabetes, Hypertension, Chronic Kidney Disease, and Cardiovascular Disease). The system utilizes a hybrid approach, combining rule-based clinical scoring with machine learning models for refined probability assessment.
+ChronoCare AI is an advanced, full-stack medical intelligence platform designed to predict, detect, and track chronic disease risks including **Diabetes, Hypertension, Chronic Kidney Disease (CKD), and Cardiovascular Disease**. The system utilizes a hybrid approach, combining strict rule-based clinical scoring constraints with machine learning models for a refined and robust clinical probability assessment.
 
-## Key Features
+---
 
-*   **Intelligent Data Intake:** Upload Excel (`.xlsx`) or CSV reports, mapping raw tabular healthcare data directly to form UI inputs and saving hours of manual data entry for doctors.
-*   **Multi-Disease Risk Engine:** Predicts probabilities for specific diseases (Diabetes, Hypertension, Chronic Kidney Disease, Cardiovascular Disease) or auto-detects risks using a unified array.
-*   **Longitudinal Timeline Tracking:** Generates detailed clinical risk reports (JSON & PDF) and organizes them into isolated patient folders locally. The system builds an interactive historical health trajectory timeline per patient ID.
-*   **Hybrid Decision Logic:** Merges rigid medical rule-base heuristics (like immediate critical alerts for high BP) with underlying Scikit-learn predictive modeling.
-*   **Dynamic Role Portals:** Distinct viewing experiences. Doctors can assign data to any patient ID and view all alerts, while Patients see a locked, auto-linked portal customized for their own history.
+## 🚀 Key Features
 
-## Tech Stack
+* **Intelligent Data Intake (OCR & Tabular)**
+  Upload patient medical reports as PDF, Excel (`.xlsx`), or CSV format. The built-in extraction engine maps raw tabular healthcare data, normalizes medical aliases (e.g., matching "fasting blood sugar" to "Glucose"), and directly populates UI forms. This saves hours of manual data entry for doctors.
+* **Multi-Disease Risk Engine (Registry-Driven)**
+  Predicts probabilities for specific diseases or auto-detects risks using a unified array. The orchestrator efficiently dynamically infers which diseases can be tested based on the supplied parameters.
+* **Hybrid Decision Logic**
+  Merges rigid medical rule-base heuristics (like immediate critical alerts for high Blood Pressure) with underlying Scikit-learn predictive modeling (Random Forests, Gradient Boosting).
+* **Longitudinal Timeline Tracking**
+  Generates detailed clinical risk reports (available for PDF Export) and organizes them into isolated patient histories. The timeline engine builds interactive historical health trajectory graphs per patient ID.
+* **Dynamic Role Portals (RBAC via JWT)**
+  Provides distinct viewing experiences:
+  * **Doctor Portal:** Can assign data to any patient ID, run predictions, list all patients, and view all global alerts and history.
+  * **Patient Portal:** A locked, auto-linked portal customized exclusively for their own history.
 
-*   **Frontend:** React, Vite, TailwindCSS, Recharts, Lucide Icons
-*   **Backend:** Python 3, Flask, Pandas, Scikit-learn, ReportLab
-*   **Storage Framework:** Local JSON/PDF Storage API with logic built for secure Google Drive API integration.
+## 🛠️ Tech Stack
 
-## Setup & Running
+* **Frontend:** React, Vite, TailwindCSS, Recharts, Lucide Icons
+* **Backend:** Python 3, Flask, Pandas, Scikit-learn, ReportLab (PDF Generation), PyPDF/pdfplumber (Data Extraction)
+* **Storage Framework:** Local JSON Storage API with fallbacks and logic mapped out for secure Google Drive API integration.
 
-1.  **Clone the Repository**
-2.  **Set up the Virtual Environment & Install Dependencies:**
-    
-    **Backend (Python):**
-    ```powershell
-    # Create and activate a virtual environment
-    python -m venv .venv
-    .\.venv\Scripts\Activate.ps1
-    
-    # Install backend requirements
-    pip install -r requirements.txt
-    ```
+## ⚙️ Setup & Running
 
-    **Frontend (Node.js):**
-    ```powershell
-    cd frontend
-    npm install
-    cd ..
-    ```
+**Prerequisites:** Python 3.8+ and Node.js v18+.
 
-3.  **Start the Platform:**
-    The project includes a unified `start.py` script that simultaneously boots the Python backend API (port 5000) and the Vite frontend (port 5173). **Make sure your virtual environment is activated before running.**
-    ```powershell
-    # Windows
-    .\.venv\Scripts\Activate.ps1
-    python start.py
-    ```
-    Then, navigate to `http://localhost:5173` in your browser.
+1. **Clone the Repository:**
+   ```powershell
+   git clone <your-repo-url>
+   cd Innoverse
+   ```
 
-## Backend Structure
+2. **Set up the Virtual Environment & Install Dependencies:**
+   
+   **Backend (Python):**
+   ```powershell
+   # Create and activate a virtual environment
+   python -m venv .venv
+   .\.venv\Scripts\Activate.ps1
+   
+   # Install backend requirements
+   pip install -r requirements.txt
+   ```
 
-*   `backend/multi_disease_engine.py`: Orchestrates the risk models and clinical rules.
-*   `backend/disease_registry.py`: Model loader and requirement definitions.
-*   `backend/drive_storage.py`: Handles Google Drive API logic and folder generation.
-*   `backend/auth.py`: JWT authentication.
-*   `backend/report_generator.py`: Converts results into downloadable clinical PDF formats.
+   **Frontend (Node.js):**
+   ```powershell
+   cd frontend
+   npm install
+   cd ..
+   ```
+
+3. **Start the Platform:**
+   The project includes a unified `start.py` script that simultaneously boots the Python backend API (port 5000) and the Vite frontend (port 5173).
+   
+   **Make sure your virtual environment is activated before running.**
+   ```powershell
+   # Windows
+   .\.venv\Scripts\Activate.ps1
+   python start.py
+   ```
+   Then, navigate to `http://localhost:5173` in your browser.
+
+## 📂 Backend Architecture
+
+* `backend/multi_disease_engine.py`: Core orchestrator combining ML inference, rule-based tracking, and trend analysis.
+* `backend/disease_registry.py`: Centralized configuration mapping diseases to required model features and file paths.
+* `backend/rule_engine.py`: Pure clinical heuristic definitions per disease.
+* `api/routes.py`: Flask blueprints for data extraction (`/extract-report`), predictions (`/predict`), and report export (`/export-pdf`).
+* `backend/drive_storage.py`: Local & remote Google Drive abstraction logic for histories.
+* `backend/auth.py`: Cryptographic JWT authentication, hashing, and User DB JSON persistence.
+* `backend/report_generator.py`: Converts results into downloadable clinical PDF formats using ReportLab.
 
 ---
 *Predict. Detect. Prevent.*

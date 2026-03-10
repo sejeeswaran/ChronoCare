@@ -1,16 +1,30 @@
-# React + Vite
+# ChronoCare AI Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This directory contains the user interface for the ChronoCare AI risk intelligence platform.
 
-Currently, two official plugins are available:
+## Architecture
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Built using modern web technologies:
+- **Framework**: React 18 + Vite
+- **Styling**: TailwindCSS
+- **Charting**: Recharts for patient history trend graphs
+- **Icons**: Lucide React
+- **Authentication**: JWT-based session management communicating with the Flask Backend
 
-## React Compiler
+## Getting Started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+To run the frontend individually (without the `start.py` root script):
 
-## Expanding the ESLint configuration
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+The Vite development server will start at `http://localhost:5173`. It expects the Python backend to be running simultaneously on `http://127.0.0.1:5000`.
+
+## Linting
+
+```bash
+npm run lint
+```

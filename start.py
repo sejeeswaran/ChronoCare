@@ -20,7 +20,6 @@ def main():
     backend_process = subprocess.Popen(
         [sys.executable, "app.py"],
         cwd=project_root,
-        stdout=subprocess.DEVNULL,
         stderr=None
     )
     time.sleep(2)

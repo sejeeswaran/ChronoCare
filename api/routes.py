@@ -442,8 +442,7 @@ def timeline(patient_id):
     history = []
     for record in records:
         ts = record.get("timestamp", "")
-        date_str = ts[:10] if len(ts) >= 10 else ts
-        entry = {"date": date_str}
+        entry = {"date": ts}
         results = record.get("results", {})
         for disease_name, disease_data in results.items():
             if isinstance(disease_data, dict) and "probability" in disease_data:
